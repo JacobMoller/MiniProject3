@@ -18,10 +18,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ReplicationClient interface {
-	// Sends a greeting for a new server participant
-	NewServer(ctx context.Context, in *NewServerRequest, opts ...grpc.CallOption) (*NewServerReply, error)
-	// Sends a greeting for a new frontend participant
-	NewFrontEnd(ctx context.Context, in *NewFrontEndRequest, opts ...grpc.CallOption) (*NewFrontEndReply, error)
+	// Sends a greeting for a new node participant
+	NewNode(ctx context.Context, in *NewNodeRequest, opts ...grpc.CallOption) (*NewNodeReply, error)
 }
 
 type replicationClient struct {
@@ -32,18 +30,9 @@ func NewReplicationClient(cc grpc.ClientConnInterface) ReplicationClient {
 	return &replicationClient{cc}
 }
 
-func (c *replicationClient) NewServer(ctx context.Context, in *NewServerRequest, opts ...grpc.CallOption) (*NewServerReply, error) {
-	out := new(NewServerReply)
-	err := c.cc.Invoke(ctx, "/communication.Replication/NewServer", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *replicationClient) NewFrontEnd(ctx context.Context, in *NewFrontEndRequest, opts ...grpc.CallOption) (*NewFrontEndReply, error) {
-	out := new(NewFrontEndReply)
-	err := c.cc.Invoke(ctx, "/communication.Replication/NewFrontEnd", in, out, opts...)
+func (c *replicationClient) NewNode(ctx context.Context, in *NewNodeRequest, opts ...grpc.CallOption) (*NewNodeReply, error) {
+	out := new(NewNodeReply)
+	err := c.cc.Invoke(ctx, "/communication.Replication/NewNode", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -54,10 +43,8 @@ func (c *replicationClient) NewFrontEnd(ctx context.Context, in *NewFrontEndRequ
 // All implementations must embed UnimplementedReplicationServer
 // for forward compatibility
 type ReplicationServer interface {
-	// Sends a greeting for a new server participant
-	NewServer(context.Context, *NewServerRequest) (*NewServerReply, error)
-	// Sends a greeting for a new frontend participant
-	NewFrontEnd(context.Context, *NewFrontEndRequest) (*NewFrontEndReply, error)
+	// Sends a greeting for a new node participant
+	NewNode(context.Context, *NewNodeRequest) (*NewNodeReply, error)
 	mustEmbedUnimplementedReplicationServer()
 }
 
@@ -65,11 +52,8 @@ type ReplicationServer interface {
 type UnimplementedReplicationServer struct {
 }
 
-func (UnimplementedReplicationServer) NewServer(context.Context, *NewServerRequest) (*NewServerReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method NewServer not implemented")
-}
-func (UnimplementedReplicationServer) NewFrontEnd(context.Context, *NewFrontEndRequest) (*NewFrontEndReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method NewFrontEnd not implemented")
+func (UnimplementedReplicationServer) NewNode(context.Context, *NewNodeRequest) (*NewNodeReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NewNode not implemented")
 }
 func (UnimplementedReplicationServer) mustEmbedUnimplementedReplicationServer() {}
 
@@ -84,38 +68,20 @@ func RegisterReplicationServer(s grpc.ServiceRegistrar, srv ReplicationServer) {
 	s.RegisterService(&Replication_ServiceDesc, srv)
 }
 
-func _Replication_NewServer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(NewServerRequest)
+func _Replication_NewNode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NewNodeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ReplicationServer).NewServer(ctx, in)
+		return srv.(ReplicationServer).NewNode(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/communication.Replication/NewServer",
+		FullMethod: "/communication.Replication/NewNode",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ReplicationServer).NewServer(ctx, req.(*NewServerRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Replication_NewFrontEnd_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(NewFrontEndRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ReplicationServer).NewFrontEnd(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/communication.Replication/NewFrontEnd",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ReplicationServer).NewFrontEnd(ctx, req.(*NewFrontEndRequest))
+		return srv.(ReplicationServer).NewNode(ctx, req.(*NewNodeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -128,12 +94,8 @@ var Replication_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*ReplicationServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "NewServer",
-			Handler:    _Replication_NewServer_Handler,
-		},
-		{
-			MethodName: "NewFrontEnd",
-			Handler:    _Replication_NewFrontEnd_Handler,
+			MethodName: "NewNode",
+			Handler:    _Replication_NewNode_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

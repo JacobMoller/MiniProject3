@@ -25,7 +25,7 @@ func main() {
 	defer conn.Close()
 
 	frontend := protobuf.NewReplicationClient(conn)
-	message, err2 := frontend.NewFrontEnd(context.Background(), &protobuf.NewFrontEndRequest{FrontEndName: name})
+	message, err2 := frontend.NewNode(context.Background(), &protobuf.NewNodeRequest{Name: name, Type: *protobuf.NewNodeRequest_FrontEnd.Enum()})
 	if err2 != nil {
 		//Error handling
 		if message == nil {

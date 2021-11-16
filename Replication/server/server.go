@@ -16,6 +16,7 @@ type server struct {
 }
 
 var frontends []string
+var servers []string
 
 func main() {
 	lis, err := net.Listen("tcp", ":8080")
@@ -32,27 +33,47 @@ func main() {
 	}
 }
 
-func (s *server) NewFrontEnd(ctx context.Context, in *protobuf.NewFrontEndRequest) (*protobuf.NewFrontEndReply, error) {
-	//Register the new FrontEnd
-
-	if alreadyExists(in.FrontEndName) {
-		fmt.Println("FrontEnd DENIED (frontEndName: \"" + in.FrontEndName + "\")")
-		return &protobuf.NewFrontEndReply{}, errors.New("USERNAME IS ALREADY IN USE")
-	} else {
-		fmt.Println("NEW FrontEnd (frontEndName: \"" + in.FrontEndName + "\")")
-		frontends = append(frontends, in.FrontEndName)
+func (s *server) NewNode(ctx context.Context, in *protobuf.NewNodeRequest) (*protobuf.NewNodeReply, error) {
+	//Which type is this?
+	var sliceToUse *[]string
+	if in.Type == *protobuf.NewNodeRequest_FrontEnd.Enum() {
+		sliceToUse = &frontends
+	} else if in.Type == *protobuf.NewNodeRequest_Server.Enum() {
+		sliceToUse = &servers
 	}
+	if alreadyExists(*sliceToUse, in.Name) {
+		fmt.Println("Node DENIED (name: \"" + in.Name + "\", type: " + in.Type.String() + ")")
+		return &protobuf.NewNodeReply{}, errors.New("USERNAME IS ALREADY IN USE")
+	} else {
+		fmt.Println("NEW Node (name: \"" + in.Name + "\", type: " + in.Type.String() + ")")
+		*sliceToUse = append(*sliceToUse, in.Name)
+	}
+	printSlice(frontends)
+	printSlice(servers)
+	//Register the new FrontEnd
 	//Broadcast this new info to all Servers
 	//After reply from servers, reply to FrontEnd
-	return &protobuf.NewFrontEndReply{}, nil
+	return &protobuf.NewNodeReply{}, nil
 }
 
-func alreadyExists(frontEndName string) bool {
-	var existsInFrontEnd = false
-	for i := 0; i < len(frontends); i++ {
-		if frontends[i] == frontEndName {
-			existsInFrontEnd = true
+func alreadyExists(pool []string, inputName string) bool {
+	var existsInPool = false
+	for i := 0; i < len(pool); i++ {
+		if pool[i] == inputName {
+			existsInPool = true
 		}
 	}
-	return existsInFrontEnd
+	return existsInPool
+}
+
+func printSlice(sliceToPrint []string) {
+	fmt.Print("[")
+	for i := 0; i < len(sliceToPrint); i++ {
+		fmt.Print(sliceToPrint[i])
+		if i != len(sliceToPrint)-1 {
+			fmt.Print(", ")
+		}
+	}
+	fmt.Print("]")
+	fmt.Println()
 }

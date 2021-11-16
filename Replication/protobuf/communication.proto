@@ -4,27 +4,20 @@ package communication;
 option go_package = "https://github.com/JacobMoller/MiniProject3;protobuf";
 
 service Replication {
-  // Sends a greeting for a new server participant
-  rpc NewServer (NewServerRequest) returns (NewServerReply) {}
-
-  // Sends a greeting for a new frontend participant
-  rpc NewFrontEnd (NewFrontEndRequest) returns (NewFrontEndReply) {}
+  // Sends a greeting for a new node participant
+  rpc NewNode (NewNodeRequest) returns (NewNodeReply) {}
 }
 
-// The request message containing the Servers's name.
-message NewServerRequest {
-  string ServerName = 1;
-}
-
-// The response message containing if the addition was succesful
-message NewServerReply {
-}
-
-// The request message containing the Frontend's name.
-message NewFrontEndRequest {
-  string FrontEndName = 1;
+// The request message containing the Node's name.
+message NewNodeRequest {
+  string name = 1;
+  enum Type {
+    Server = 0;
+    FrontEnd = 1;
+  }
+  Type type = 2;
 }
 
 // The response message containing if the addition was succesful
-message NewFrontEndReply {
+message NewNodeReply {
 }
