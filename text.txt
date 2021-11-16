@@ -1,0 +1,8 @@
+new Server("S1",Type.Server);
+new Server("S2",Type.Server);
+new Server("S3",Type.Server);
+new FrontEnd("FE1",Type.FrontEnd);
+new FrontEnd("FE2",Type.FrontEnd);
+new Client("C1",Type.Client);
+new Client("C2",Type.Client);
+//Clients byder automatisk herfra
