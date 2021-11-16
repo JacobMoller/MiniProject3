@@ -7,6 +7,10 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strconv"
+	"bufio"
+	"strings"
+	"os"
 
 	"google.golang.org/grpc"
 )
@@ -15,10 +19,70 @@ type server struct {
 	protobuf.UnimplementedReplicationServer
 }
 
+type Server struct {
+	Name string
+	Port int
+}
+
 var frontends []string
 var servers []string
+var primary string
 
 func main() {
+	log.Print("Welcome Server. You need to provide a name (either S1, S2 or S3):")
+	reader := bufio.NewReader(os.Stdin)
+	text, _ := reader.ReadString('\n')
+	name := strings.Replace(text, "\n", "", 1)
+	port := strings.Replace(name, "S", "", 1)
+	primary = "S1"
+
+	lis, err := net.Listen("tcp", ":808"+port)
+
+	if err != nil { //error before listening
+		log.Fatalf("failed to listen: %v", err)
+	}
+	s := grpc.NewServer() //we create a new server
+	protobuf.RegisterReplicationServer(s, &server{})
+
+	if (name == primary) {
+		//Open port or something stuff out
+		go testPrimary()
+	} else{
+		//Be ready to listen to the primary
+		go notPrimary()
+	}
+
+	log.Printf("server listening at %v", lis.Addr())
+	if err := s.Serve(lis); err != nil { //error while listening
+		log.Fatalf("failed to serve: %v", err)
+	}
+}
+
+func testPrimary(){
+	fmt.Println("Primary. Setting up dial")
+
+	conn, err := grpc.Dial(":8080", grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil { //error can not establish connection
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+
+	frontend := protobuf.NewReplicationClient(conn)
+	message, err2 := frontend.NewNode(context.Background(), &protobuf.NewNodeRequest{Name: "Secret-Server Talking :)", Type: *protobuf.NewNodeRequest_Server.Enum()})
+	if err2 != nil {
+		//Error handling
+		if message == nil {
+			fmt.Println("Username is already in use for this type")
+		}
+	} else {
+		//Start to do stuff here
+		//client.something()
+		fmt.Println("Dial Done")
+	}
+}
+
+func notPrimary(){
+	fmt.Println("Not primary. Setting up listener")
 	lis, err := net.Listen("tcp", ":8080")
 
 	if err != nil { //error before listening
@@ -76,4 +140,8 @@ func printSlice(sliceToPrint []string) {
 	}
 	fmt.Print("]")
 	fmt.Println()
+}
+
+func (s *Server) ToString() {
+	fmt.Println(s.Name + " " + strconv.Itoa(s.Port))
 }

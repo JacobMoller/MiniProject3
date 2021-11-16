@@ -6,3 +6,9 @@ new FrontEnd("FE2",Type.FrontEnd);
 new Client("C1",Type.Client);
 new Client("C2",Type.Client);
 //Clients byder automatisk herfra
+
+//PORTS
+//Primary   8080
+//Server    8081 - 8083
+//FrontEnd  8084 - 8085
+//Client    8086 - 8087     IF NEEDED
