@@ -2,15 +2,16 @@ package main
 
 import (
 	"MiniProject3/Replication/protobuf"
+	"bufio"
 	"context"
 	"errors"
 	"fmt"
 	"log"
 	"net"
-	"strconv"
-	"bufio"
-	"strings"
 	"os"
+	"strconv"
+	"strings"
+	"time"
 
 	"google.golang.org/grpc"
 )
@@ -24,6 +25,8 @@ type Server struct {
 	Port int
 }
 
+var thisServerName string
+
 var frontends []string
 var servers []string
 var primary string
@@ -34,7 +37,7 @@ func main() {
 	text, _ := reader.ReadString('\n')
 	name := strings.Replace(text, "\n", "", 1)
 	port := strings.Replace(name, "S", "", 1)
-	primary = "S1"
+	thisServerName = name
 
 	lis, err := net.Listen("tcp", ":808"+port)
 
@@ -44,12 +47,9 @@ func main() {
 	s := grpc.NewServer() //we create a new server
 	protobuf.RegisterReplicationServer(s, &server{})
 
-	if (name == primary) {
+	if name == primary {
 		//Open port or something stuff out
 		go testPrimary()
-	} else{
-		//Be ready to listen to the primary
-		go notPrimary()
 	}
 
 	log.Printf("server listening at %v", lis.Addr())
@@ -58,43 +58,30 @@ func main() {
 	}
 }
 
-func testPrimary(){
-	fmt.Println("Primary. Setting up dial")
+var connectionsList []*grpc.ClientConn
 
-	conn, err := grpc.Dial(":8080", grpc.WithInsecure(), grpc.WithBlock())
+func testPrimary() {
+	fmt.Println("Primary. Setting up dial")
+	connectionsToDial := []int{8082, 8083}
+	for i := 0; i < len(connectionsToDial); i++ {
+		go dial(connectionsToDial[i])
+	}
+	fmt.Println("Dial Done")
+	for {
+		broadcastToOtherServers(connectionsList)
+		time.Sleep(5 * time.Second)
+	}
+}
+
+func dial(connPort int) {
+	fmt.Println("Setting up dial for connection to port " + strconv.Itoa(connPort))
+	conn, err := grpc.Dial(":"+strconv.Itoa(connPort), grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil { //error can not establish connection
 		log.Fatalf("did not connect: %v", err)
 	}
+	connectionsList = append(connectionsList, conn)
 	defer conn.Close()
-
-	frontend := protobuf.NewReplicationClient(conn)
-	message, err2 := frontend.NewNode(context.Background(), &protobuf.NewNodeRequest{Name: "Secret-Server Talking :)", Type: *protobuf.NewNodeRequest_Server.Enum()})
-	if err2 != nil {
-		//Error handling
-		if message == nil {
-			fmt.Println("Username is already in use for this type")
-		}
-	} else {
-		//Start to do stuff here
-		//client.something()
-		fmt.Println("Dial Done")
-	}
-}
-
-func notPrimary(){
-	fmt.Println("Not primary. Setting up listener")
-	lis, err := net.Listen("tcp", ":8080")
-
-	if err != nil { //error before listening
-		log.Fatalf("failed to listen: %v", err)
-	}
-	s := grpc.NewServer() //we create a new server
-	protobuf.RegisterReplicationServer(s, &server{})
-
-	log.Printf("server listening at %v", lis.Addr())
-	if err := s.Serve(lis); err != nil { //error while listening
-		log.Fatalf("failed to serve: %v", err)
-	}
+	fmt.Println("Dial for connection to port " + strconv.Itoa(connPort) + " is done!")
 }
 
 func (s *server) NewNode(ctx context.Context, in *protobuf.NewNodeRequest) (*protobuf.NewNodeReply, error) {
@@ -144,4 +131,28 @@ func printSlice(sliceToPrint []string) {
 
 func (s *Server) ToString() {
 	fmt.Println(s.Name + " " + strconv.Itoa(s.Port))
+}
+
+func broadcastToOtherServers(connectionsList []*grpc.ClientConn) {
+	var newServers = []string{}
+	var newFrontEnds = []string{}
+	var newCurrentWinner = "C1"
+	var newHighestBid int32 = 0
+	var newPrimaryServer = thisServerName
+
+	newServers = append(newServers, thisServerName)
+	for i := 0; i < len(connectionsList); i++ {
+		fmt.Println("Passing server-info to server " + connectionsList[i].Target())
+		frontend := protobuf.NewReplicationClient(connectionsList[i])
+		message, err2 := frontend.ServerInternalCommunication(context.Background(), &protobuf.ServerChangeRequest{NewServers: newServers, NewFrontEnds: newFrontEnds, NewCurrentWinner: newCurrentWinner, NewHighestBid: newHighestBid, NewPrimaryServer: newPrimaryServer})
+		if err2 != nil {
+			//Error handling
+			if message == nil {
+				fmt.Println("Username is already in use for this type")
+			}
+		} else {
+			//Start to do stuff here
+			//client.something()
+		}
+	}
 }

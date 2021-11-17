@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 type ReplicationClient interface {
 	// Sends a greeting for a new node participant
 	NewNode(ctx context.Context, in *NewNodeRequest, opts ...grpc.CallOption) (*NewNodeReply, error)
+	ServerInternalCommunication(ctx context.Context, in *ServerChangeRequest, opts ...grpc.CallOption) (*ServerChangeReply, error)
 }
 
 type replicationClient struct {
@@ -39,12 +40,22 @@ func (c *replicationClient) NewNode(ctx context.Context, in *NewNodeRequest, opt
 	return out, nil
 }
 
+func (c *replicationClient) ServerInternalCommunication(ctx context.Context, in *ServerChangeRequest, opts ...grpc.CallOption) (*ServerChangeReply, error) {
+	out := new(ServerChangeReply)
+	err := c.cc.Invoke(ctx, "/communication.Replication/ServerInternalCommunication", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ReplicationServer is the server API for Replication service.
 // All implementations must embed UnimplementedReplicationServer
 // for forward compatibility
 type ReplicationServer interface {
 	// Sends a greeting for a new node participant
 	NewNode(context.Context, *NewNodeRequest) (*NewNodeReply, error)
+	ServerInternalCommunication(context.Context, *ServerChangeRequest) (*ServerChangeReply, error)
 	mustEmbedUnimplementedReplicationServer()
 }
 
@@ -54,6 +65,9 @@ type UnimplementedReplicationServer struct {
 
 func (UnimplementedReplicationServer) NewNode(context.Context, *NewNodeRequest) (*NewNodeReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NewNode not implemented")
+}
+func (UnimplementedReplicationServer) ServerInternalCommunication(context.Context, *ServerChangeRequest) (*ServerChangeReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ServerInternalCommunication not implemented")
 }
 func (UnimplementedReplicationServer) mustEmbedUnimplementedReplicationServer() {}
 
@@ -86,6 +100,24 @@ func _Replication_NewNode_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Replication_ServerInternalCommunication_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ServerChangeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReplicationServer).ServerInternalCommunication(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/communication.Replication/ServerInternalCommunication",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReplicationServer).ServerInternalCommunication(ctx, req.(*ServerChangeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Replication_ServiceDesc is the grpc.ServiceDesc for Replication service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -96,6 +128,10 @@ var Replication_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "NewNode",
 			Handler:    _Replication_NewNode_Handler,
+		},
+		{
+			MethodName: "ServerInternalCommunication",
+			Handler:    _Replication_ServerInternalCommunication_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
