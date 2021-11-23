@@ -52,6 +52,8 @@ func TakeInput(client protobuf.ReplicationClient) {
 			fmt.Println("Input was text")
 			//Text input
 			//if(input == "get") => get the newest result
+			var result, _ = client.Result(context.Background(), &protobuf.ResultRequest{})
+			fmt.Println("Current highest bid is: " + strconv.FormatInt(result.Amount, 10))
 		} else {
 			fmt.Println("Input was int64")
 			client.NewBid(context.Background(), &protobuf.NewBidRequest{Amount: amount})

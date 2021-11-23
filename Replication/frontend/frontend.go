@@ -137,7 +137,8 @@ func (s *server) NewBid(ctx context.Context, in *protobuf.NewBidRequest) (*proto
 	var responseFromServerTwo, _ = FrontendConn2.Result(context.Background(), &protobuf.ResultRequest{})
 	var responseFromServerThree, _ = FrontendConn3.Result(context.Background(), &protobuf.ResultRequest{})
 
-	var serverHighestBid = MaxInt(responseFromServerOne.Amount, responseFromServerTwo.Amount, responseFromServerThree.Amount)
+	var one, two, three = ValidateReponsesFromServers(responseFromServerOne, responseFromServerTwo, responseFromServerThree)
+	var serverHighestBid = MaxInt(one, two, three)
 
 	if in.Amount > serverHighestBid {
 		fmt.Println("Your bid is very good. tnx 4 moneys")
@@ -149,6 +150,20 @@ func (s *server) NewBid(ctx context.Context, in *protobuf.NewBidRequest) (*proto
 		fmt.Println("Your bid is lower or the same as the current bid. Current bid is " + strconv.FormatInt(serverHighestBid, 10))
 		return &protobuf.NewBidReply{}, errors.New("Your bid is lower or the same as the current bid. Current bid is " + strconv.FormatInt(serverHighestBid, 10))
 	}
+}
+
+func ValidateReponsesFromServers(responseFromServerOne, responseFromServerTwo, responseFromServerThree *protobuf.ResultReply) (int64, int64, int64) {
+	var one, two, three int64
+	if responseFromServerOne.String() != "<nil>" {
+		one = responseFromServerOne.Amount
+	}
+	if responseFromServerTwo.String() != "<nil>" {
+		two = responseFromServerTwo.Amount
+	}
+	if responseFromServerThree.String() != "<nil>" {
+		three = responseFromServerThree.Amount
+	}
+	return one, two, three
 }
 
 func MaxInt(x, y, z int64) int64 {
@@ -170,4 +185,26 @@ func printSlice(sliceToPrint []string) {
 	}
 	fmt.Print("]")
 	fmt.Println()
+}
+
+func (s *server) Result(ctx context.Context, in *protobuf.ResultRequest) (*protobuf.ResultReply, error) {
+	var responseFromServerOne, _ = FrontendConn1.Result(context.Background(), &protobuf.ResultRequest{})   //200
+	var responseFromServerTwo, _ = FrontendConn2.Result(context.Background(), &protobuf.ResultRequest{})   //200
+	var responseFromServerThree, _ = FrontendConn3.Result(context.Background(), &protobuf.ResultRequest{}) //150
+
+	var one, two, three = ValidateReponsesFromServers(responseFromServerOne, responseFromServerTwo, responseFromServerThree)
+	var amount = BringToSync(one, two, three)
+
+	return &protobuf.ResultReply{Amount: amount}, nil
+}
+
+func BringToSync(one, two, three int64) int64 {
+	var serverHighestBid = MaxInt(one, two, three)
+	if one != two || two != three || one != three {
+		//Override all values to bring to sync
+		FrontendConn1.NewBid(context.Background(), &protobuf.NewBidRequest{Amount: serverHighestBid})
+		FrontendConn2.NewBid(context.Background(), &protobuf.NewBidRequest{Amount: serverHighestBid})
+		FrontendConn3.NewBid(context.Background(), &protobuf.NewBidRequest{Amount: serverHighestBid})
+	}
+	return serverHighestBid
 }

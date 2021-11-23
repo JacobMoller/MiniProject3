@@ -21,7 +21,7 @@ type server struct {
 
 var frontends []string
 var servers []string
-var amount int64 = 200
+var amount int64
 
 func main() {
 	log.Print("Welcome Server. You need to provide a name:")
