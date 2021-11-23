@@ -30,6 +30,7 @@ message NewBidRequest {
 }
 
 message NewBidReply {
+  string message = 1;
 }
 
 message ResultRequest {

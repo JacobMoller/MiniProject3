@@ -141,14 +141,12 @@ func (s *server) NewBid(ctx context.Context, in *protobuf.NewBidRequest) (*proto
 	var serverHighestBid = MaxInt(one, two, three)
 
 	if in.Amount > serverHighestBid {
-		fmt.Println("Your bid is very good. tnx 4 moneys")
 		FrontendConn1.NewBid(context.Background(), &protobuf.NewBidRequest{Amount: in.Amount})
 		FrontendConn2.NewBid(context.Background(), &protobuf.NewBidRequest{Amount: in.Amount})
 		FrontendConn3.NewBid(context.Background(), &protobuf.NewBidRequest{Amount: in.Amount})
-		return &protobuf.NewBidReply{}, nil
+		return &protobuf.NewBidReply{Message: "Your bid was confirmed."}, nil
 	} else {
-		fmt.Println("Your bid is lower or the same as the current bid. Current bid is " + strconv.FormatInt(serverHighestBid, 10))
-		return &protobuf.NewBidReply{}, errors.New("Your bid is lower or the same as the current bid. Current bid is " + strconv.FormatInt(serverHighestBid, 10))
+		return &protobuf.NewBidReply{Message: "Your bid is lower or the same as the current bid. Current bid is " + strconv.FormatInt(serverHighestBid, 10)}, nil //TODO: errors.New("Your bid is lower or the same as the current bid.")
 	}
 }
 

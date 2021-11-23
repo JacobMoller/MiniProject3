@@ -47,7 +47,7 @@ func main() {
 func (s *server) NewBid(ctx context.Context, in *protobuf.NewBidRequest) (*protobuf.NewBidReply, error) {
 	fmt.Println("Server Received bid: " + strconv.FormatInt(in.Amount, 10))
 	amount = in.Amount
-	return &protobuf.NewBidReply{}, nil
+	return &protobuf.NewBidReply{Message: ""}, nil
 }
 
 func (s *server) NewNode(ctx context.Context, in *protobuf.NewNodeRequest) (*protobuf.NewNodeReply, error) {
