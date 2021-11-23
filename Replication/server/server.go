@@ -11,6 +11,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"google.golang.org/grpc"
 )
@@ -22,6 +23,8 @@ type server struct {
 var frontends []string
 var servers []string
 var amount int64
+var timeleft int64 = -1
+var ticking bool
 
 func main() {
 	log.Print("Welcome Server. You need to provide a name:")
@@ -44,10 +47,19 @@ func main() {
 	}
 }
 
+func TimeTick() {
+	ticking = true
+	for {
+		timeleft--
+		fmt.Println("time left: " + strconv.FormatInt(timeleft, 10))
+		time.Sleep(time.Second)
+	}
+}
+
 func (s *server) NewBid(ctx context.Context, in *protobuf.NewBidRequest) (*protobuf.NewBidReply, error) {
 	fmt.Println("Server Received bid: " + strconv.FormatInt(in.Amount, 10))
 	amount = in.Amount
-	return &protobuf.NewBidReply{Message: ""}, nil
+	return &protobuf.NewBidReply{}, nil
 }
 
 func (s *server) NewNode(ctx context.Context, in *protobuf.NewNodeRequest) (*protobuf.NewNodeReply, error) {
@@ -64,6 +76,10 @@ func (s *server) NewNode(ctx context.Context, in *protobuf.NewNodeRequest) (*pro
 	} else {
 		fmt.Println("NEW Node (name: \"" + in.Name + "\", type: " + in.Type.String() + ")")
 		*sliceToUse = append(*sliceToUse, in.Name)
+		if timeleft == -1 {
+			timeleft = 600
+			go TimeTick()
+		}
 	}
 	printSlice(frontends)
 	printSlice(servers)
@@ -97,4 +113,16 @@ func printSlice(sliceToPrint []string) {
 	}
 	fmt.Print("]")
 	fmt.Println()
+}
+
+func (s *server) GetTime(ctx context.Context, in *protobuf.GetTimeRequest) (*protobuf.GetTimeReply, error) {
+	return &protobuf.GetTimeReply{TimeLeft: timeleft}, nil
+}
+
+func (s *server) NewTime(ctx context.Context, in *protobuf.NewTimeRequest) (*protobuf.NewTimeReply, error) {
+	timeleft = in.TimeLeft
+	if !ticking {
+		go TimeTick()
+	}
+	return &protobuf.NewTimeReply{}, nil
 }

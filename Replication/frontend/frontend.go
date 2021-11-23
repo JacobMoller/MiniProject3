@@ -137,7 +137,7 @@ func (s *server) NewBid(ctx context.Context, in *protobuf.NewBidRequest) (*proto
 	var responseFromServerTwo, _ = FrontendConn2.Result(context.Background(), &protobuf.ResultRequest{})
 	var responseFromServerThree, _ = FrontendConn3.Result(context.Background(), &protobuf.ResultRequest{})
 
-	var one, two, three = ValidateReponsesFromServers(responseFromServerOne, responseFromServerTwo, responseFromServerThree)
+	var one, two, three = ValidateResultsReponsesFromServers(responseFromServerOne, responseFromServerTwo, responseFromServerThree)
 	var serverHighestBid = MaxInt(one, two, three)
 
 	if in.Amount > serverHighestBid {
@@ -150,7 +150,7 @@ func (s *server) NewBid(ctx context.Context, in *protobuf.NewBidRequest) (*proto
 	}
 }
 
-func ValidateReponsesFromServers(responseFromServerOne, responseFromServerTwo, responseFromServerThree *protobuf.ResultReply) (int64, int64, int64) {
+func ValidateResultsReponsesFromServers(responseFromServerOne, responseFromServerTwo, responseFromServerThree *protobuf.ResultReply) (int64, int64, int64) {
 	var one, two, three int64
 	if responseFromServerOne.String() != "<nil>" {
 		one = responseFromServerOne.Amount
@@ -164,6 +164,20 @@ func ValidateReponsesFromServers(responseFromServerOne, responseFromServerTwo, r
 	return one, two, three
 }
 
+func ValidateTimeReponsesFromServers(responseFromServerOne, responseFromServerTwo, responseFromServerThree *protobuf.GetTimeReply) (int64, int64, int64) {
+	var one, two, three int64 = 600, 600, 600
+	if responseFromServerOne.String() != "<nil>" {
+		one = responseFromServerOne.TimeLeft
+	}
+	if responseFromServerTwo.String() != "<nil>" {
+		two = responseFromServerTwo.TimeLeft
+	}
+	if responseFromServerThree.String() != "<nil>" {
+		three = responseFromServerThree.TimeLeft
+	}
+	return one, two, three
+}
+
 func MaxInt(x, y, z int64) int64 {
 	if x >= y && x >= z {
 		return x
@@ -171,6 +185,18 @@ func MaxInt(x, y, z int64) int64 {
 		return y
 	}
 	return z
+}
+
+func MinInt(x, y, z int64) int64 {
+	var min int64
+	if x < y && x < z && x > 0 {
+		min = x
+	} else if y < x && y < z && y > 0 {
+		min = y
+	} else if z > 0 {
+		min = z
+	}
+	return min
 }
 
 func printSlice(sliceToPrint []string) {
@@ -190,13 +216,13 @@ func (s *server) Result(ctx context.Context, in *protobuf.ResultRequest) (*proto
 	var responseFromServerTwo, _ = FrontendConn2.Result(context.Background(), &protobuf.ResultRequest{})   //200
 	var responseFromServerThree, _ = FrontendConn3.Result(context.Background(), &protobuf.ResultRequest{}) //150
 
-	var one, two, three = ValidateReponsesFromServers(responseFromServerOne, responseFromServerTwo, responseFromServerThree)
-	var amount = BringToSync(one, two, three)
+	var one, two, three = ValidateResultsReponsesFromServers(responseFromServerOne, responseFromServerTwo, responseFromServerThree)
+	var amount = BringResultToSync(one, two, three)
 
 	return &protobuf.ResultReply{Amount: amount}, nil
 }
 
-func BringToSync(one, two, three int64) int64 {
+func BringResultToSync(one, two, three int64) int64 {
 	var serverHighestBid = MaxInt(one, two, three)
 	if one != two || two != three || one != three {
 		//Override all values to bring to sync
@@ -205,4 +231,27 @@ func BringToSync(one, two, three int64) int64 {
 		FrontendConn3.NewBid(context.Background(), &protobuf.NewBidRequest{Amount: serverHighestBid})
 	}
 	return serverHighestBid
+}
+
+func (s *server) GetTime(ctx context.Context, in *protobuf.GetTimeRequest) (*protobuf.GetTimeReply, error) {
+	var responseFromServerOne, _ = FrontendConn1.GetTime(context.Background(), &protobuf.GetTimeRequest{})
+	var responseFromServerTwo, _ = FrontendConn2.GetTime(context.Background(), &protobuf.GetTimeRequest{})
+	var responseFromServerThree, _ = FrontendConn3.GetTime(context.Background(), &protobuf.GetTimeRequest{})
+
+	var one, two, three = ValidateTimeReponsesFromServers(responseFromServerOne, responseFromServerTwo, responseFromServerThree)
+	var time = BringTimeToSync(one, two, three)
+
+	return &protobuf.GetTimeReply{TimeLeft: time}, nil
+}
+
+func BringTimeToSync(one, two, three int64) int64 {
+	var minimumTimeLeft = MinInt(one, two, three)
+	fmt.Println("Minimum: " + strconv.FormatInt(minimumTimeLeft, 10) + " Based on " + strconv.FormatInt(one, 10) + "; " + strconv.FormatInt(two, 10) + "; " + strconv.FormatInt(three, 10) + ";")
+	if one != two || two != three || one != three {
+		//Override all values to bring to sync
+		FrontendConn1.NewTime(context.Background(), &protobuf.NewTimeRequest{TimeLeft: minimumTimeLeft})
+		FrontendConn2.NewTime(context.Background(), &protobuf.NewTimeRequest{TimeLeft: minimumTimeLeft})
+		FrontendConn3.NewTime(context.Background(), &protobuf.NewTimeRequest{TimeLeft: minimumTimeLeft})
+	}
+	return minimumTimeLeft
 }

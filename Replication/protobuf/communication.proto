@@ -8,6 +8,8 @@ service Replication {
   rpc NewNode (NewNodeRequest) returns (NewNodeReply) {}
   rpc NewBid (NewBidRequest) returns (NewBidReply) {}
   rpc Result (ResultRequest) returns (ResultReply) {}
+  rpc GetTime (GetTimeRequest) returns (GetTimeReply) {}
+  rpc NewTime (NewTimeRequest) returns (NewTimeReply) {}
 }
 
 // The request message containing the Node's name.
@@ -38,4 +40,18 @@ message ResultRequest {
 
 message ResultReply{
   int64 amount = 1;
+}
+
+message GetTimeRequest {
+}
+
+message GetTimeReply{
+  int64 timeLeft = 1;
+}
+
+message NewTimeRequest{
+  int64 timeLeft = 1;
+}
+
+message NewTimeReply {
 }

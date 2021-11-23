@@ -53,6 +53,8 @@ func TakeInput(client protobuf.ReplicationClient) {
 				var result, _ = client.Result(context.Background(), &protobuf.ResultRequest{})
 				fmt.Println("Current highest bid is: " + strconv.FormatInt(result.Amount, 10))
 			} else if inputParsed == "time" {
+				var result, _ = client.GetTime(context.Background(), &protobuf.GetTimeRequest{})
+				fmt.Println("Current time left: " + strconv.FormatInt(result.TimeLeft, 10))
 				//method here
 			} else {
 				fmt.Println("Unknown command" + commandList)
