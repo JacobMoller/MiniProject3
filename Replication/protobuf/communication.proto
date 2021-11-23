@@ -16,6 +16,7 @@ message NewNodeRequest {
   enum Type {
     Server = 0;
     FrontEnd = 1;
+    Client = 2;
   }
   Type type = 2;
 }

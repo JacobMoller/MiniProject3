@@ -4,8 +4,10 @@ import (
 	"MiniProject3/Replication/protobuf"
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"log"
+	"net"
 	"os"
 	"strconv"
 	"strings"
@@ -13,6 +15,12 @@ import (
 
 	"google.golang.org/grpc"
 )
+
+type server struct {
+	protobuf.UnimplementedReplicationServer
+}
+
+var clients []string
 
 func main() {
 	log.Print("Welcome Frontend. You need to provide a name for the server to remember you:")
@@ -33,6 +41,20 @@ func main() {
 	defer Conn3.Close()
 
 	//Listen for client bids here
+	//EXPERIMENTAL START
+	lis, err := net.Listen("tcp", ":8085")
+
+	if err != nil { //error before listening
+		log.Fatalf("failed to listen: %v", err)
+	}
+	s := grpc.NewServer() //we create a new server
+	protobuf.RegisterReplicationServer(s, &server{})
+
+	log.Printf("server listening at %v", lis.Addr())
+	if err := s.Serve(lis); err != nil { //error while listening
+		log.Fatalf("failed to serve: %v", err)
+	}
+	//EXPERIMENTAL END
 
 	time.Sleep(1000 * time.Second)
 }
@@ -67,4 +89,40 @@ func SendBids(frontend protobuf.ReplicationClient) {
 		frontend.NewBid(context.Background(), &protobuf.NewBidRequest{Amount: amount})
 		time.Sleep(2 * time.Second)
 	}
+}
+
+func (s *server) NewNode(ctx context.Context, in *protobuf.NewNodeRequest) (*protobuf.NewNodeReply, error) {
+	//Which type is this?
+	if alreadyExists(clients, in.Name) {
+		fmt.Println("Node DENIED (name: \"" + in.Name + "\", type: " + in.Type.String() + ")")
+		return &protobuf.NewNodeReply{}, errors.New("USERNAME IS ALREADY IN USE")
+	} else {
+		fmt.Println("NEW Node (name: \"" + in.Name + "\", type: " + in.Type.String() + ")")
+		clients = append(clients, in.Name)
+	}
+	printSlice(clients)
+
+	return &protobuf.NewNodeReply{}, nil
+}
+
+func alreadyExists(pool []string, inputName string) bool {
+	var existsInPool = false
+	for i := 0; i < len(pool); i++ {
+		if pool[i] == inputName {
+			existsInPool = true
+		}
+	}
+	return existsInPool
+}
+
+func printSlice(sliceToPrint []string) {
+	fmt.Print("[")
+	for i := 0; i < len(sliceToPrint); i++ {
+		fmt.Print(sliceToPrint[i])
+		if i != len(sliceToPrint)-1 {
+			fmt.Print(", ")
+		}
+	}
+	fmt.Print("]")
+	fmt.Println()
 }
