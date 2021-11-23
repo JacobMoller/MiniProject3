@@ -14,6 +14,8 @@ import (
 	"google.golang.org/grpc"
 )
 
+var commandList = "\n To bid, enter an integer.\n To see the current highest bid, enter \"get\"\n To see the time left, enter \"time\""
+
 func main() {
 	log.Print("Welcome Client. You need to provide a name for the frontend to remember you:")
 	reader := bufio.NewReader(os.Stdin)
@@ -34,9 +36,8 @@ func main() {
 			fmt.Println("Username is already in use")
 		}
 	} else {
-		fmt.Println("Welcome to the auction.\n To bid, enter an integer.\n To see the current highest bid, enter text")
+		fmt.Println("Welcome to the auction." + commandList)
 		go TakeInput(client)
-		//EnterToChat()
 		time.Sleep(1000 * time.Second)
 	}
 }
@@ -48,8 +49,14 @@ func TakeInput(client protobuf.ReplicationClient) {
 		inputParsed := strings.Replace(input, "\n", "", 1)
 		amount, err := strconv.ParseInt(inputParsed, 10, 64)
 		if err != nil {
-			var result, _ = client.Result(context.Background(), &protobuf.ResultRequest{})
-			fmt.Println("Current highest bid is: " + strconv.FormatInt(result.Amount, 10))
+			if inputParsed == "get" {
+				var result, _ = client.Result(context.Background(), &protobuf.ResultRequest{})
+				fmt.Println("Current highest bid is: " + strconv.FormatInt(result.Amount, 10))
+			} else if inputParsed == "time" {
+				//method here
+			} else {
+				fmt.Println("Unknown command" + commandList)
+			}
 		} else {
 			var result, _ = client.NewBid(context.Background(), &protobuf.NewBidRequest{Amount: amount})
 			fmt.Println(result.Message)
