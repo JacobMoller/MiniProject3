@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
+	"time"
 
 	"google.golang.org/grpc"
 )
@@ -33,5 +35,26 @@ func main() {
 		}
 	} else {
 		fmt.Println("We are ready to do stuff from the client! :)")
+		go TakeInput(client)
+		//EnterToChat()
+		time.Sleep(1000 * time.Second)
+	}
+}
+
+func TakeInput(client protobuf.ReplicationClient) {
+	for {
+		reader := bufio.NewReader(os.Stdin)
+		input, _ := reader.ReadString('\n')
+		inputParsed := strings.Replace(input, "\n", "", 1)
+		fmt.Println("Input is \"" + inputParsed + "\"")
+		amount, err := strconv.ParseInt(inputParsed, 10, 64)
+		if err != nil {
+			fmt.Println("Input was text")
+			//Text input
+			//if(input == "get") => get the newest result
+		} else {
+			fmt.Println("Input was int64")
+			client.NewBid(context.Background(), &protobuf.NewBidRequest{Amount: amount})
+		}
 	}
 }

@@ -21,6 +21,7 @@ type server struct {
 
 var frontends []string
 var servers []string
+var amount int64 = 200
 
 func main() {
 	log.Print("Welcome Server. You need to provide a name:")
@@ -44,7 +45,8 @@ func main() {
 }
 
 func (s *server) NewBid(ctx context.Context, in *protobuf.NewBidRequest) (*protobuf.NewBidReply, error) {
-	fmt.Println("Received bid: " + strconv.FormatInt(in.Amount, 10))
+	fmt.Println("Server Received bid: " + strconv.FormatInt(in.Amount, 10))
+	amount = in.Amount
 	return &protobuf.NewBidReply{}, nil
 }
 
@@ -69,6 +71,10 @@ func (s *server) NewNode(ctx context.Context, in *protobuf.NewNodeRequest) (*pro
 	//Broadcast this new info to all Servers
 	//After reply from servers, reply to FrontEnd
 	return &protobuf.NewNodeReply{}, nil
+}
+
+func (s *server) Result(ctx context.Context, in *protobuf.ResultRequest) (*protobuf.ResultReply, error) {
+	return &protobuf.ResultReply{Amount: amount}, nil
 }
 
 func alreadyExists(pool []string, inputName string) bool {
