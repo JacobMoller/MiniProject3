@@ -15,12 +15,13 @@ import (
 )
 
 var commandList = "\n To bid, enter an integer.\n To see the current highest bid, enter \"get\"\n To see the time left, enter \"time\""
+var name string
 
 func main() {
 	log.Print("Welcome Client. You need to provide a name for the frontend to remember you:")
 	reader := bufio.NewReader(os.Stdin)
 	text, _ := reader.ReadString('\n')
-	name := strings.Replace(text, "\n", "", 1)
+	name = strings.Replace(text, "\n", "", 1)
 
 	conn, err := grpc.Dial(":8085", grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil { //error can not establish connection
@@ -51,7 +52,7 @@ func TakeInput(client protobuf.ReplicationClient) {
 		if err != nil {
 			if inputParsed == "get" {
 				var result, _ = client.Result(context.Background(), &protobuf.ResultRequest{})
-				fmt.Println("Current highest bid is: " + strconv.FormatInt(result.Amount, 10))
+				fmt.Println("Current highest bid is: " + strconv.FormatInt(result.Amount, 10) + " and is from \"" + result.Bidder + "\"")
 			} else if inputParsed == "time" {
 				var result, _ = client.GetTime(context.Background(), &protobuf.GetTimeRequest{})
 				fmt.Println("Current time left: " + strconv.FormatInt(result.TimeLeft, 10))
@@ -60,7 +61,7 @@ func TakeInput(client protobuf.ReplicationClient) {
 				fmt.Println("Unknown command" + commandList)
 			}
 		} else {
-			var result, _ = client.NewBid(context.Background(), &protobuf.NewBidRequest{Amount: amount})
+			var result, _ = client.NewBid(context.Background(), &protobuf.NewBidRequest{Bidder: name, Amount: amount})
 			fmt.Println(result.Message)
 		}
 	}

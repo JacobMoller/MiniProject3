@@ -28,7 +28,8 @@ message NewNodeReply {
 }
 
 message NewBidRequest {
-  int64 amount = 1;
+  string bidder = 1;
+  int64 amount = 2;
 }
 
 message NewBidReply {
@@ -39,7 +40,9 @@ message ResultRequest {
 }
 
 message ResultReply{
-  int64 amount = 1;
+  string bidder = 1;
+  int64 amount = 2;
+  int64 timeLeft = 3;
 }
 
 message GetTimeRequest {

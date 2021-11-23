@@ -22,6 +22,7 @@ type server struct {
 
 var frontends []string
 var servers []string
+var bidder string
 var amount int64
 var timeleft int64 = -1
 var ticking bool
@@ -50,7 +51,12 @@ func main() {
 func TimeTick() {
 	ticking = true
 	for {
-		timeleft--
+		if timeleft > 0 {
+			timeleft--
+		} else {
+			fmt.Println("Times up")
+			break
+		}
 		fmt.Println("time left: " + strconv.FormatInt(timeleft, 10))
 		time.Sleep(time.Second)
 	}
@@ -59,6 +65,7 @@ func TimeTick() {
 func (s *server) NewBid(ctx context.Context, in *protobuf.NewBidRequest) (*protobuf.NewBidReply, error) {
 	fmt.Println("Server Received bid: " + strconv.FormatInt(in.Amount, 10))
 	amount = in.Amount
+	bidder = in.Bidder
 	return &protobuf.NewBidReply{}, nil
 }
 
@@ -77,7 +84,7 @@ func (s *server) NewNode(ctx context.Context, in *protobuf.NewNodeRequest) (*pro
 		fmt.Println("NEW Node (name: \"" + in.Name + "\", type: " + in.Type.String() + ")")
 		*sliceToUse = append(*sliceToUse, in.Name)
 		if timeleft == -1 {
-			timeleft = 600
+			timeleft = 30
 			go TimeTick()
 		}
 	}
@@ -90,7 +97,7 @@ func (s *server) NewNode(ctx context.Context, in *protobuf.NewNodeRequest) (*pro
 }
 
 func (s *server) Result(ctx context.Context, in *protobuf.ResultRequest) (*protobuf.ResultReply, error) {
-	return &protobuf.ResultReply{Amount: amount}, nil
+	return &protobuf.ResultReply{Bidder: bidder, Amount: amount, TimeLeft: timeleft}, nil
 }
 
 func alreadyExists(pool []string, inputName string) bool {
