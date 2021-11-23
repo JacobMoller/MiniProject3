@@ -2,11 +2,15 @@ package main
 
 import (
 	"MiniProject3/Replication/protobuf"
+	"bufio"
 	"context"
 	"errors"
 	"fmt"
 	"log"
 	"net"
+	"os"
+	"strconv"
+	"strings"
 
 	"google.golang.org/grpc"
 )
@@ -19,7 +23,13 @@ var frontends []string
 var servers []string
 
 func main() {
-	lis, err := net.Listen("tcp", ":8080")
+	log.Print("Welcome Server. You need to provide a name:")
+	reader := bufio.NewReader(os.Stdin)
+	text, _ := reader.ReadString('\n')
+	name := strings.Replace(text, "\n", "", 1)
+	port := strings.Replace(name, "S", "", 1)
+
+	lis, err := net.Listen("tcp", ":808"+port)
 
 	if err != nil { //error before listening
 		log.Fatalf("failed to listen: %v", err)
@@ -31,6 +41,11 @@ func main() {
 	if err := s.Serve(lis); err != nil { //error while listening
 		log.Fatalf("failed to serve: %v", err)
 	}
+}
+
+func (s *server) NewBid(ctx context.Context, in *protobuf.NewBidRequest) (*protobuf.NewBidReply, error) {
+	fmt.Println("Received bid: " + strconv.FormatInt(in.Amount, 10))
+	return &protobuf.NewBidReply{}, nil
 }
 
 func (s *server) NewNode(ctx context.Context, in *protobuf.NewNodeRequest) (*protobuf.NewNodeReply, error) {

@@ -6,6 +6,8 @@ option go_package = "https://github.com/JacobMoller/MiniProject3;protobuf";
 service Replication {
   // Sends a greeting for a new node participant
   rpc NewNode (NewNodeRequest) returns (NewNodeReply) {}
+  rpc NewBid (NewBidRequest) returns (NewBidReply) {}
+  rpc Result (ResultRequest) returns (ResultReply) {}
 }
 
 // The request message containing the Node's name.
@@ -20,4 +22,18 @@ message NewNodeRequest {
 
 // The response message containing if the addition was succesful
 message NewNodeReply {
+}
+
+message NewBidRequest {
+  int64 amount = 1;
+}
+
+message NewBidReply {
+}
+
+message ResultRequest {
+}
+
+message ResultReply{
+  int64 amount = 1;
 }
