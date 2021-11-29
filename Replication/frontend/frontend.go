@@ -128,28 +128,41 @@ func (s *server) NewBid(ctx context.Context, in *protobuf.NewBidRequest) (*proto
 	var one, two, three = ValidateResultsReponsesFromServers(responseFromServerOne, responseFromServerTwo, responseFromServerThree)
 
 	var timeleft int64
-	if one.TimeLeft > 0 && one.TimeLeft != 30 {
+	if one != nil && one.TimeLeft > 0 && one.TimeLeft != 30 {
 		timeleft = one.TimeLeft
 	}
-	if two.TimeLeft > 0 && two.TimeLeft != 30 {
+	if two != nil && two.TimeLeft > 0 && two.TimeLeft != 30 {
 		timeleft = two.TimeLeft
 	}
-	if three.TimeLeft > 0 && three.TimeLeft != 30 {
+	if two != nil && three.TimeLeft > 0 && three.TimeLeft != 30 {
 		timeleft = three.TimeLeft
 	}
 
 	var bidder string
-	if one.Bidder != "" {
+	if one != nil && one.Bidder != "" {
 		bidder = one.Bidder
 	}
-	if two.Bidder != "" {
+	if two != nil && two.Bidder != "" {
 		bidder = two.Bidder
 	}
-	if three.Bidder != "" {
+	if three != nil && three.Bidder != "" {
 		bidder = three.Bidder
 	}
 
-	var serverHighestBid = MaxInt(one.Amount, two.Amount, three.Amount)
+	var oneAmount int64
+	var twoAmount int64
+	var threeAmount int64
+	if one != nil {
+		oneAmount = one.Amount
+	}
+	if two != nil {
+		twoAmount = two.Amount
+	}
+	if three != nil {
+		threeAmount = three.Amount
+	}
+
+	var serverHighestBid = MaxInt(oneAmount, twoAmount, threeAmount)
 	if timeleft > 0 {
 		if in.Amount > serverHighestBid {
 			FrontendConn1.NewBid(context.Background(), &protobuf.NewBidRequest{Bidder: in.Bidder, Amount: in.Amount})
@@ -237,31 +250,45 @@ func (s *server) Result(ctx context.Context, in *protobuf.ResultRequest) (*proto
 
 func BringResultToSync(one, two, three *protobuf.ResultReply) (string, int64, int64) {
 	var bidder string
-	var serverHighestBid = MaxInt(one.Amount, two.Amount, three.Amount)
-	var timeleft int64
-	if one.Amount != two.Amount || two.Amount != three.Amount || one.Amount != three.Amount {
-		//Override all values to bring to sync
-		FrontendConn1.NewBid(context.Background(), &protobuf.NewBidRequest{Bidder: one.Bidder, Amount: serverHighestBid})
-		FrontendConn2.NewBid(context.Background(), &protobuf.NewBidRequest{Bidder: two.Bidder, Amount: serverHighestBid})
-		FrontendConn3.NewBid(context.Background(), &protobuf.NewBidRequest{Bidder: three.Bidder, Amount: serverHighestBid})
+	var oneAmount int64
+	var twoAmount int64
+	var threeAmount int64
+	if one != nil {
+		oneAmount = one.Amount
 	}
-	if one.Bidder != "" {
+	if two != nil {
+		twoAmount = two.Amount
+	}
+	if three != nil {
+		threeAmount = three.Amount
+	}
+
+	var serverHighestBid = MaxInt(oneAmount, twoAmount, threeAmount)
+	var timeleft int64
+	if oneAmount != twoAmount || twoAmount != threeAmount || oneAmount != threeAmount {
+		//Override all values to bring to sync
+		//TODO: this should not be the bidder that already exists in that server, but the one that sent the highest to one of the servers.
+		var _, _ = FrontendConn1.NewBid(context.Background(), &protobuf.NewBidRequest{Bidder: one.Bidder, Amount: serverHighestBid})
+		var _, _ = FrontendConn2.NewBid(context.Background(), &protobuf.NewBidRequest{Bidder: two.Bidder, Amount: serverHighestBid})
+		var _, _ = FrontendConn3.NewBid(context.Background(), &protobuf.NewBidRequest{Bidder: three.Bidder, Amount: serverHighestBid})
+	}
+	if one != nil && one.Bidder != "" {
 		bidder = one.Bidder
 	}
-	if two.Bidder != "" {
+	if two != nil && two.Bidder != "" {
 		bidder = two.Bidder
 	}
-	if three.Bidder != "" {
+	if three != nil && three.Bidder != "" {
 		bidder = three.Bidder
 	}
 
-	if one.TimeLeft > 0 && one.TimeLeft != 30 {
+	if one != nil && one.TimeLeft > 0 && one.TimeLeft != 30 {
 		timeleft = one.TimeLeft
 	}
-	if two.TimeLeft > 0 && two.TimeLeft != 30 {
+	if two != nil && two.TimeLeft > 0 && two.TimeLeft != 30 {
 		timeleft = two.TimeLeft
 	}
-	if three.TimeLeft > 0 && three.TimeLeft != 30 {
+	if three != nil && three.TimeLeft > 0 && three.TimeLeft != 30 {
 		timeleft = three.TimeLeft
 	}
 
