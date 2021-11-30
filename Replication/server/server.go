@@ -70,7 +70,6 @@ func (s *server) NewBid(ctx context.Context, in *protobuf.NewBidRequest) (*proto
 }
 
 func (s *server) NewNode(ctx context.Context, in *protobuf.NewNodeRequest) (*protobuf.NewNodeReply, error) {
-	//Which type is this?
 	var sliceToUse *[]string
 	if in.Type == *protobuf.NewNodeRequest_FrontEnd.Enum() {
 		sliceToUse = &frontends
@@ -90,9 +89,6 @@ func (s *server) NewNode(ctx context.Context, in *protobuf.NewNodeRequest) (*pro
 	}
 	printSlice(frontends)
 	printSlice(servers)
-	//Register the new FrontEnd
-	//Broadcast this new info to all Servers
-	//After reply from servers, reply to FrontEnd
 	return &protobuf.NewNodeReply{}, nil
 }
 
