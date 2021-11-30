@@ -20,6 +20,10 @@ const _ = grpc.SupportPackageIsVersion7
 type ReplicationClient interface {
 	// Sends a greeting for a new node participant
 	NewNode(ctx context.Context, in *NewNodeRequest, opts ...grpc.CallOption) (*NewNodeReply, error)
+	NewBid(ctx context.Context, in *NewBidRequest, opts ...grpc.CallOption) (*NewBidReply, error)
+	Result(ctx context.Context, in *ResultRequest, opts ...grpc.CallOption) (*ResultReply, error)
+	GetTime(ctx context.Context, in *GetTimeRequest, opts ...grpc.CallOption) (*GetTimeReply, error)
+	NewTime(ctx context.Context, in *NewTimeRequest, opts ...grpc.CallOption) (*NewTimeReply, error)
 }
 
 type replicationClient struct {
@@ -39,12 +43,52 @@ func (c *replicationClient) NewNode(ctx context.Context, in *NewNodeRequest, opt
 	return out, nil
 }
 
+func (c *replicationClient) NewBid(ctx context.Context, in *NewBidRequest, opts ...grpc.CallOption) (*NewBidReply, error) {
+	out := new(NewBidReply)
+	err := c.cc.Invoke(ctx, "/communication.Replication/NewBid", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *replicationClient) Result(ctx context.Context, in *ResultRequest, opts ...grpc.CallOption) (*ResultReply, error) {
+	out := new(ResultReply)
+	err := c.cc.Invoke(ctx, "/communication.Replication/Result", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *replicationClient) GetTime(ctx context.Context, in *GetTimeRequest, opts ...grpc.CallOption) (*GetTimeReply, error) {
+	out := new(GetTimeReply)
+	err := c.cc.Invoke(ctx, "/communication.Replication/GetTime", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *replicationClient) NewTime(ctx context.Context, in *NewTimeRequest, opts ...grpc.CallOption) (*NewTimeReply, error) {
+	out := new(NewTimeReply)
+	err := c.cc.Invoke(ctx, "/communication.Replication/NewTime", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ReplicationServer is the server API for Replication service.
 // All implementations must embed UnimplementedReplicationServer
 // for forward compatibility
 type ReplicationServer interface {
 	// Sends a greeting for a new node participant
 	NewNode(context.Context, *NewNodeRequest) (*NewNodeReply, error)
+	NewBid(context.Context, *NewBidRequest) (*NewBidReply, error)
+	Result(context.Context, *ResultRequest) (*ResultReply, error)
+	GetTime(context.Context, *GetTimeRequest) (*GetTimeReply, error)
+	NewTime(context.Context, *NewTimeRequest) (*NewTimeReply, error)
 	mustEmbedUnimplementedReplicationServer()
 }
 
@@ -54,6 +98,18 @@ type UnimplementedReplicationServer struct {
 
 func (UnimplementedReplicationServer) NewNode(context.Context, *NewNodeRequest) (*NewNodeReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NewNode not implemented")
+}
+func (UnimplementedReplicationServer) NewBid(context.Context, *NewBidRequest) (*NewBidReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NewBid not implemented")
+}
+func (UnimplementedReplicationServer) Result(context.Context, *ResultRequest) (*ResultReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Result not implemented")
+}
+func (UnimplementedReplicationServer) GetTime(context.Context, *GetTimeRequest) (*GetTimeReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTime not implemented")
+}
+func (UnimplementedReplicationServer) NewTime(context.Context, *NewTimeRequest) (*NewTimeReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NewTime not implemented")
 }
 func (UnimplementedReplicationServer) mustEmbedUnimplementedReplicationServer() {}
 
@@ -86,6 +142,78 @@ func _Replication_NewNode_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Replication_NewBid_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NewBidRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReplicationServer).NewBid(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/communication.Replication/NewBid",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReplicationServer).NewBid(ctx, req.(*NewBidRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Replication_Result_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResultRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReplicationServer).Result(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/communication.Replication/Result",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReplicationServer).Result(ctx, req.(*ResultRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Replication_GetTime_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTimeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReplicationServer).GetTime(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/communication.Replication/GetTime",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReplicationServer).GetTime(ctx, req.(*GetTimeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Replication_NewTime_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NewTimeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReplicationServer).NewTime(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/communication.Replication/NewTime",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReplicationServer).NewTime(ctx, req.(*NewTimeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Replication_ServiceDesc is the grpc.ServiceDesc for Replication service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -96,6 +224,22 @@ var Replication_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "NewNode",
 			Handler:    _Replication_NewNode_Handler,
+		},
+		{
+			MethodName: "NewBid",
+			Handler:    _Replication_NewBid_Handler,
+		},
+		{
+			MethodName: "Result",
+			Handler:    _Replication_Result_Handler,
+		},
+		{
+			MethodName: "GetTime",
+			Handler:    _Replication_GetTime_Handler,
+		},
+		{
+			MethodName: "NewTime",
+			Handler:    _Replication_NewTime_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

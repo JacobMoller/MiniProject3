@@ -25,6 +25,7 @@ type NewNodeRequest_Type int32
 const (
 	NewNodeRequest_Server   NewNodeRequest_Type = 0
 	NewNodeRequest_FrontEnd NewNodeRequest_Type = 1
+	NewNodeRequest_Client   NewNodeRequest_Type = 2
 )
 
 // Enum value maps for NewNodeRequest_Type.
@@ -32,10 +33,12 @@ var (
 	NewNodeRequest_Type_name = map[int32]string{
 		0: "Server",
 		1: "FrontEnd",
+		2: "Client",
 	}
 	NewNodeRequest_Type_value = map[string]int32{
 		"Server":   0,
 		"FrontEnd": 1,
+		"Client":   2,
 	}
 )
 
@@ -161,32 +164,444 @@ func (*NewNodeReply) Descriptor() ([]byte, []int) {
 	return file_Replication_protobuf_communication_proto_rawDescGZIP(), []int{1}
 }
 
+type NewBidRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Bidder string `protobuf:"bytes,1,opt,name=bidder,proto3" json:"bidder,omitempty"`
+	Amount int64  `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
+}
+
+func (x *NewBidRequest) Reset() {
+	*x = NewBidRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_Replication_protobuf_communication_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *NewBidRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NewBidRequest) ProtoMessage() {}
+
+func (x *NewBidRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_Replication_protobuf_communication_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NewBidRequest.ProtoReflect.Descriptor instead.
+func (*NewBidRequest) Descriptor() ([]byte, []int) {
+	return file_Replication_protobuf_communication_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *NewBidRequest) GetBidder() string {
+	if x != nil {
+		return x.Bidder
+	}
+	return ""
+}
+
+func (x *NewBidRequest) GetAmount() int64 {
+	if x != nil {
+		return x.Amount
+	}
+	return 0
+}
+
+type NewBidReply struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Message string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+}
+
+func (x *NewBidReply) Reset() {
+	*x = NewBidReply{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_Replication_protobuf_communication_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *NewBidReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NewBidReply) ProtoMessage() {}
+
+func (x *NewBidReply) ProtoReflect() protoreflect.Message {
+	mi := &file_Replication_protobuf_communication_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NewBidReply.ProtoReflect.Descriptor instead.
+func (*NewBidReply) Descriptor() ([]byte, []int) {
+	return file_Replication_protobuf_communication_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *NewBidReply) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+type ResultRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *ResultRequest) Reset() {
+	*x = ResultRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_Replication_protobuf_communication_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ResultRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResultRequest) ProtoMessage() {}
+
+func (x *ResultRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_Replication_protobuf_communication_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResultRequest.ProtoReflect.Descriptor instead.
+func (*ResultRequest) Descriptor() ([]byte, []int) {
+	return file_Replication_protobuf_communication_proto_rawDescGZIP(), []int{4}
+}
+
+type ResultReply struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Bidder   string `protobuf:"bytes,1,opt,name=bidder,proto3" json:"bidder,omitempty"`
+	Amount   int64  `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
+	TimeLeft int64  `protobuf:"varint,3,opt,name=timeLeft,proto3" json:"timeLeft,omitempty"`
+}
+
+func (x *ResultReply) Reset() {
+	*x = ResultReply{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_Replication_protobuf_communication_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ResultReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResultReply) ProtoMessage() {}
+
+func (x *ResultReply) ProtoReflect() protoreflect.Message {
+	mi := &file_Replication_protobuf_communication_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResultReply.ProtoReflect.Descriptor instead.
+func (*ResultReply) Descriptor() ([]byte, []int) {
+	return file_Replication_protobuf_communication_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *ResultReply) GetBidder() string {
+	if x != nil {
+		return x.Bidder
+	}
+	return ""
+}
+
+func (x *ResultReply) GetAmount() int64 {
+	if x != nil {
+		return x.Amount
+	}
+	return 0
+}
+
+func (x *ResultReply) GetTimeLeft() int64 {
+	if x != nil {
+		return x.TimeLeft
+	}
+	return 0
+}
+
+type GetTimeRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *GetTimeRequest) Reset() {
+	*x = GetTimeRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_Replication_protobuf_communication_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetTimeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTimeRequest) ProtoMessage() {}
+
+func (x *GetTimeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_Replication_protobuf_communication_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTimeRequest.ProtoReflect.Descriptor instead.
+func (*GetTimeRequest) Descriptor() ([]byte, []int) {
+	return file_Replication_protobuf_communication_proto_rawDescGZIP(), []int{6}
+}
+
+type GetTimeReply struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	TimeLeft int64 `protobuf:"varint,1,opt,name=timeLeft,proto3" json:"timeLeft,omitempty"`
+}
+
+func (x *GetTimeReply) Reset() {
+	*x = GetTimeReply{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_Replication_protobuf_communication_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetTimeReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTimeReply) ProtoMessage() {}
+
+func (x *GetTimeReply) ProtoReflect() protoreflect.Message {
+	mi := &file_Replication_protobuf_communication_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTimeReply.ProtoReflect.Descriptor instead.
+func (*GetTimeReply) Descriptor() ([]byte, []int) {
+	return file_Replication_protobuf_communication_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *GetTimeReply) GetTimeLeft() int64 {
+	if x != nil {
+		return x.TimeLeft
+	}
+	return 0
+}
+
+type NewTimeRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	TimeLeft int64 `protobuf:"varint,1,opt,name=timeLeft,proto3" json:"timeLeft,omitempty"`
+}
+
+func (x *NewTimeRequest) Reset() {
+	*x = NewTimeRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_Replication_protobuf_communication_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *NewTimeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NewTimeRequest) ProtoMessage() {}
+
+func (x *NewTimeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_Replication_protobuf_communication_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NewTimeRequest.ProtoReflect.Descriptor instead.
+func (*NewTimeRequest) Descriptor() ([]byte, []int) {
+	return file_Replication_protobuf_communication_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *NewTimeRequest) GetTimeLeft() int64 {
+	if x != nil {
+		return x.TimeLeft
+	}
+	return 0
+}
+
+type NewTimeReply struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *NewTimeReply) Reset() {
+	*x = NewTimeReply{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_Replication_protobuf_communication_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *NewTimeReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NewTimeReply) ProtoMessage() {}
+
+func (x *NewTimeReply) ProtoReflect() protoreflect.Message {
+	mi := &file_Replication_protobuf_communication_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NewTimeReply.ProtoReflect.Descriptor instead.
+func (*NewTimeReply) Descriptor() ([]byte, []int) {
+	return file_Replication_protobuf_communication_proto_rawDescGZIP(), []int{9}
+}
+
 var File_Replication_protobuf_communication_proto protoreflect.FileDescriptor
 
 var file_Replication_protobuf_communication_proto_rawDesc = []byte{
 	0x0a, 0x28, 0x52, 0x65, 0x70, 0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2f, 0x70, 0x72,
 	0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x63, 0x6f, 0x6d, 0x6d, 0x75, 0x6e, 0x69, 0x63, 0x61,
 	0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x0d, 0x63, 0x6f, 0x6d, 0x6d,
-	0x75, 0x6e, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0x7e, 0x0a, 0x0e, 0x4e, 0x65, 0x77,
-	0x4e, 0x6f, 0x64, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6e,
-	0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12,
-	0x36, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x22, 0x2e,
-	0x63, 0x6f, 0x6d, 0x6d, 0x75, 0x6e, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x4e, 0x65,
-	0x77, 0x4e, 0x6f, 0x64, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x2e, 0x54, 0x79, 0x70,
-	0x65, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x22, 0x20, 0x0a, 0x04, 0x54, 0x79, 0x70, 0x65, 0x12,
-	0x0a, 0x0a, 0x06, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72, 0x10, 0x00, 0x12, 0x0c, 0x0a, 0x08, 0x46,
-	0x72, 0x6f, 0x6e, 0x74, 0x45, 0x6e, 0x64, 0x10, 0x01, 0x22, 0x0e, 0x0a, 0x0c, 0x4e, 0x65, 0x77,
-	0x4e, 0x6f, 0x64, 0x65, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x32, 0x56, 0x0a, 0x0b, 0x52, 0x65, 0x70,
+	0x75, 0x6e, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0x8a, 0x01, 0x0a, 0x0e, 0x4e, 0x65,
+	0x77, 0x4e, 0x6f, 0x64, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04,
+	0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65,
+	0x12, 0x36, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x22,
+	0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x75, 0x6e, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x4e,
+	0x65, 0x77, 0x4e, 0x6f, 0x64, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x2e, 0x54, 0x79,
+	0x70, 0x65, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x22, 0x2c, 0x0a, 0x04, 0x54, 0x79, 0x70, 0x65,
+	0x12, 0x0a, 0x0a, 0x06, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72, 0x10, 0x00, 0x12, 0x0c, 0x0a, 0x08,
+	0x46, 0x72, 0x6f, 0x6e, 0x74, 0x45, 0x6e, 0x64, 0x10, 0x01, 0x12, 0x0a, 0x0a, 0x06, 0x43, 0x6c,
+	0x69, 0x65, 0x6e, 0x74, 0x10, 0x02, 0x22, 0x0e, 0x0a, 0x0c, 0x4e, 0x65, 0x77, 0x4e, 0x6f, 0x64,
+	0x65, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x22, 0x3f, 0x0a, 0x0d, 0x4e, 0x65, 0x77, 0x42, 0x69, 0x64,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x62, 0x69, 0x64, 0x64, 0x65,
+	0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x62, 0x69, 0x64, 0x64, 0x65, 0x72, 0x12,
+	0x16, 0x0a, 0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52,
+	0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x22, 0x27, 0x0a, 0x0b, 0x4e, 0x65, 0x77, 0x42, 0x69,
+	0x64, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67,
+	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65,
+	0x22, 0x0f, 0x0a, 0x0d, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x22, 0x59, 0x0a, 0x0b, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x52, 0x65, 0x70, 0x6c, 0x79,
+	0x12, 0x16, 0x0a, 0x06, 0x62, 0x69, 0x64, 0x64, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x06, 0x62, 0x69, 0x64, 0x64, 0x65, 0x72, 0x12, 0x16, 0x0a, 0x06, 0x61, 0x6d, 0x6f, 0x75,
+	0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52, 0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74,
+	0x12, 0x1a, 0x0a, 0x08, 0x74, 0x69, 0x6d, 0x65, 0x4c, 0x65, 0x66, 0x74, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x03, 0x52, 0x08, 0x74, 0x69, 0x6d, 0x65, 0x4c, 0x65, 0x66, 0x74, 0x22, 0x10, 0x0a, 0x0e,
+	0x47, 0x65, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x2a,
+	0x0a, 0x0c, 0x47, 0x65, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x12, 0x1a,
+	0x0a, 0x08, 0x74, 0x69, 0x6d, 0x65, 0x4c, 0x65, 0x66, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03,
+	0x52, 0x08, 0x74, 0x69, 0x6d, 0x65, 0x4c, 0x65, 0x66, 0x74, 0x22, 0x2c, 0x0a, 0x0e, 0x4e, 0x65,
+	0x77, 0x54, 0x69, 0x6d, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1a, 0x0a, 0x08,
+	0x74, 0x69, 0x6d, 0x65, 0x4c, 0x65, 0x66, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x08,
+	0x74, 0x69, 0x6d, 0x65, 0x4c, 0x65, 0x66, 0x74, 0x22, 0x0e, 0x0a, 0x0c, 0x4e, 0x65, 0x77, 0x54,
+	0x69, 0x6d, 0x65, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x32, 0xf4, 0x02, 0x0a, 0x0b, 0x52, 0x65, 0x70,
 	0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x47, 0x0a, 0x07, 0x4e, 0x65, 0x77, 0x4e,
 	0x6f, 0x64, 0x65, 0x12, 0x1d, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x75, 0x6e, 0x69, 0x63, 0x61, 0x74,
 	0x69, 0x6f, 0x6e, 0x2e, 0x4e, 0x65, 0x77, 0x4e, 0x6f, 0x64, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65,
 	0x73, 0x74, 0x1a, 0x1b, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x75, 0x6e, 0x69, 0x63, 0x61, 0x74, 0x69,
 	0x6f, 0x6e, 0x2e, 0x4e, 0x65, 0x77, 0x4e, 0x6f, 0x64, 0x65, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x22,
-	0x00, 0x42, 0x36, 0x5a, 0x34, 0x68, 0x74, 0x74, 0x70, 0x73, 0x3a, 0x2f, 0x2f, 0x67, 0x69, 0x74,
-	0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x4a, 0x61, 0x63, 0x6f, 0x62, 0x4d, 0x6f, 0x6c,
-	0x6c, 0x65, 0x72, 0x2f, 0x4d, 0x69, 0x6e, 0x69, 0x50, 0x72, 0x6f, 0x6a, 0x65, 0x63, 0x74, 0x33,
-	0x3b, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x33,
+	0x00, 0x12, 0x44, 0x0a, 0x06, 0x4e, 0x65, 0x77, 0x42, 0x69, 0x64, 0x12, 0x1c, 0x2e, 0x63, 0x6f,
+	0x6d, 0x6d, 0x75, 0x6e, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x4e, 0x65, 0x77, 0x42,
+	0x69, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1a, 0x2e, 0x63, 0x6f, 0x6d, 0x6d,
+	0x75, 0x6e, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x4e, 0x65, 0x77, 0x42, 0x69, 0x64,
+	0x52, 0x65, 0x70, 0x6c, 0x79, 0x22, 0x00, 0x12, 0x44, 0x0a, 0x06, 0x52, 0x65, 0x73, 0x75, 0x6c,
+	0x74, 0x12, 0x1c, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x75, 0x6e, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f,
+	0x6e, 0x2e, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
+	0x1a, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x75, 0x6e, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e,
+	0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x22, 0x00, 0x12, 0x47, 0x0a,
+	0x07, 0x47, 0x65, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x12, 0x1d, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x75,
+	0x6e, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x47, 0x65, 0x74, 0x54, 0x69, 0x6d, 0x65,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1b, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x75, 0x6e,
+	0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x47, 0x65, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x52,
+	0x65, 0x70, 0x6c, 0x79, 0x22, 0x00, 0x12, 0x47, 0x0a, 0x07, 0x4e, 0x65, 0x77, 0x54, 0x69, 0x6d,
+	0x65, 0x12, 0x1d, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x75, 0x6e, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f,
+	0x6e, 0x2e, 0x4e, 0x65, 0x77, 0x54, 0x69, 0x6d, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x1a, 0x1b, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x75, 0x6e, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e,
+	0x2e, 0x4e, 0x65, 0x77, 0x54, 0x69, 0x6d, 0x65, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x22, 0x00, 0x42,
+	0x36, 0x5a, 0x34, 0x68, 0x74, 0x74, 0x70, 0x73, 0x3a, 0x2f, 0x2f, 0x67, 0x69, 0x74, 0x68, 0x75,
+	0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x4a, 0x61, 0x63, 0x6f, 0x62, 0x4d, 0x6f, 0x6c, 0x6c, 0x65,
+	0x72, 0x2f, 0x4d, 0x69, 0x6e, 0x69, 0x50, 0x72, 0x6f, 0x6a, 0x65, 0x63, 0x74, 0x33, 0x3b, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -202,21 +617,37 @@ func file_Replication_protobuf_communication_proto_rawDescGZIP() []byte {
 }
 
 var file_Replication_protobuf_communication_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_Replication_protobuf_communication_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_Replication_protobuf_communication_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_Replication_protobuf_communication_proto_goTypes = []interface{}{
 	(NewNodeRequest_Type)(0), // 0: communication.NewNodeRequest.Type
 	(*NewNodeRequest)(nil),   // 1: communication.NewNodeRequest
 	(*NewNodeReply)(nil),     // 2: communication.NewNodeReply
+	(*NewBidRequest)(nil),    // 3: communication.NewBidRequest
+	(*NewBidReply)(nil),      // 4: communication.NewBidReply
+	(*ResultRequest)(nil),    // 5: communication.ResultRequest
+	(*ResultReply)(nil),      // 6: communication.ResultReply
+	(*GetTimeRequest)(nil),   // 7: communication.GetTimeRequest
+	(*GetTimeReply)(nil),     // 8: communication.GetTimeReply
+	(*NewTimeRequest)(nil),   // 9: communication.NewTimeRequest
+	(*NewTimeReply)(nil),     // 10: communication.NewTimeReply
 }
 var file_Replication_protobuf_communication_proto_depIdxs = []int32{
-	0, // 0: communication.NewNodeRequest.type:type_name -> communication.NewNodeRequest.Type
-	1, // 1: communication.Replication.NewNode:input_type -> communication.NewNodeRequest
-	2, // 2: communication.Replication.NewNode:output_type -> communication.NewNodeReply
-	2, // [2:3] is the sub-list for method output_type
-	1, // [1:2] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	0,  // 0: communication.NewNodeRequest.type:type_name -> communication.NewNodeRequest.Type
+	1,  // 1: communication.Replication.NewNode:input_type -> communication.NewNodeRequest
+	3,  // 2: communication.Replication.NewBid:input_type -> communication.NewBidRequest
+	5,  // 3: communication.Replication.Result:input_type -> communication.ResultRequest
+	7,  // 4: communication.Replication.GetTime:input_type -> communication.GetTimeRequest
+	9,  // 5: communication.Replication.NewTime:input_type -> communication.NewTimeRequest
+	2,  // 6: communication.Replication.NewNode:output_type -> communication.NewNodeReply
+	4,  // 7: communication.Replication.NewBid:output_type -> communication.NewBidReply
+	6,  // 8: communication.Replication.Result:output_type -> communication.ResultReply
+	8,  // 9: communication.Replication.GetTime:output_type -> communication.GetTimeReply
+	10, // 10: communication.Replication.NewTime:output_type -> communication.NewTimeReply
+	6,  // [6:11] is the sub-list for method output_type
+	1,  // [1:6] is the sub-list for method input_type
+	1,  // [1:1] is the sub-list for extension type_name
+	1,  // [1:1] is the sub-list for extension extendee
+	0,  // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_Replication_protobuf_communication_proto_init() }
@@ -249,6 +680,102 @@ func file_Replication_protobuf_communication_proto_init() {
 				return nil
 			}
 		}
+		file_Replication_protobuf_communication_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*NewBidRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_Replication_protobuf_communication_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*NewBidReply); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_Replication_protobuf_communication_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ResultRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_Replication_protobuf_communication_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ResultReply); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_Replication_protobuf_communication_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetTimeRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_Replication_protobuf_communication_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetTimeReply); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_Replication_protobuf_communication_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*NewTimeRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_Replication_protobuf_communication_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*NewTimeReply); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -256,7 +783,7 @@ func file_Replication_protobuf_communication_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_Replication_protobuf_communication_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   2,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
