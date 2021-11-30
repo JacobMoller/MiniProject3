@@ -67,12 +67,10 @@ func Dial(port int, name string) (protobuf.ReplicationClient, *grpc.ClientConn) 
 	frontend := protobuf.NewReplicationClient(conn)
 	message, userAlreadyExistsError := frontend.NewNode(context.Background(), &protobuf.NewNodeRequest{Name: name, Type: *protobuf.NewNodeRequest_FrontEnd.Enum()})
 	if userAlreadyExistsError != nil {
-		//Error handling
 		if message == nil {
 			fmt.Println("Username is already in use")
 		}
 	} else {
-		//Start to do stuff here
 		fmt.Println("Dial to " + strconv.Itoa(port) + " was succesful")
 		return frontend, conn
 	}
@@ -278,7 +276,6 @@ func BringTimeToSync(validatedResultsFromServers []int64) int64 {
 	var minimumTimeLeft = MinInt(validatedResultsFromServers)
 	fmt.Println("Minimum: " + strconv.FormatInt(minimumTimeLeft, 10) + " Based on " + strconv.FormatInt(validatedResultsFromServers[0], 10) + "; " + strconv.FormatInt(validatedResultsFromServers[1], 10) + "; " + strconv.FormatInt(validatedResultsFromServers[2], 10) + ";")
 	if !IsEqual(validatedResultsFromServers) {
-		//Override all values to bring to syn
 		for i := 0; i < len(FrontEndConns); i++ {
 			FrontEndConns[i].NewTime(context.Background(), &protobuf.NewTimeRequest{TimeLeft: minimumTimeLeft})
 		}

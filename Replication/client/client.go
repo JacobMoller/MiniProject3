@@ -32,7 +32,6 @@ func main() {
 	client := protobuf.NewReplicationClient(conn)
 	message, err2 := client.NewNode(context.Background(), &protobuf.NewNodeRequest{Name: name, Type: *protobuf.NewNodeRequest_Client.Enum()})
 	if err2 != nil {
-		//Error handling
 		if message == nil {
 			fmt.Println("Username is already in use")
 		}
@@ -56,7 +55,6 @@ func TakeInput(client protobuf.ReplicationClient) {
 			} else if inputParsed == "time" {
 				var result, _ = client.GetTime(context.Background(), &protobuf.GetTimeRequest{})
 				fmt.Println("Current time left: " + strconv.FormatInt(result.TimeLeft, 10))
-				//method here
 			} else {
 				fmt.Println("Unknown command" + commandList)
 			}
