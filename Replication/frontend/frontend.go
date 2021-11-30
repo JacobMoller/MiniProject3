@@ -223,14 +223,17 @@ func BringResultToSync(validatedResultsFromServers []*protobuf.ResultReply) (str
 	}
 
 	var serverHighestBid = MaxInt(amounts)
+	var nameOfHighestBidder string
+	for i := 0; i < len(validatedResultsFromServers); i++ {
+		if validatedResultsFromServers[i] != nil && validatedResultsFromServers[i].Amount == serverHighestBid {
+			nameOfHighestBidder = validatedResultsFromServers[i].Bidder
+		}
+	}
 	var timeleft int64
 	if !IsEqual(amounts) {
-		//Override all values to bring to sync
-		//TODO: this should not be the bidder that already exists in that server, but the one that sent the highest to one of the servers.
-		//TODO: this is wrong as pass on the "local" bidder
 		for i := 0; i < len(amounts); i++ {
 			if amounts[i] != -1 {
-				FrontEndConns[i].NewBid(context.Background(), &protobuf.NewBidRequest{Bidder: validatedResultsFromServers[i].Bidder, Amount: serverHighestBid})
+				FrontEndConns[i].NewBid(context.Background(), &protobuf.NewBidRequest{Bidder: nameOfHighestBidder, Amount: serverHighestBid})
 			}
 		}
 	}
