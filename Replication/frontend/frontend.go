@@ -21,12 +21,9 @@ type server struct {
 }
 
 var clients []string
-var FrontendConn1 protobuf.ReplicationClient
-var Conn1 *grpc.ClientConn
-var FrontendConn2 protobuf.ReplicationClient
-var Conn2 *grpc.ClientConn
-var FrontendConn3 protobuf.ReplicationClient
-var Conn3 *grpc.ClientConn
+
+var FrontEndConns []protobuf.ReplicationClient
+var Conns []*grpc.ClientConn
 
 func main() {
 	log.Print("Welcome Frontend. You need to provide a name for the server to remember you:")
@@ -36,14 +33,11 @@ func main() {
 
 	go FrontendServerStart()
 
-	FrontendConn1, Conn1 = Dial(8081, name)
-	defer Conn1.Close()
-
-	FrontendConn2, Conn2 = Dial(8082, name)
-	defer Conn2.Close()
-
-	FrontendConn3, Conn3 = Dial(8083, name)
-	defer Conn3.Close()
+	for i := 1; i <= len(FrontEndConns); i++ {
+		portToDial := 8080 + i
+		FrontEndConns[i], Conns[i] = Dial(portToDial, name)
+		defer Conns[i].Close()
+	}
 
 	time.Sleep(1000 * time.Second)
 }
@@ -121,9 +115,9 @@ func (s *server) NewBid(ctx context.Context, in *protobuf.NewBidRequest) (*proto
 	fmt.Println("Frontend Received bid: " + strconv.FormatInt(in.Amount, 10))
 
 	//What is the servers current amount????
-	var responseFromServerOne, _ = FrontendConn1.Result(context.Background(), &protobuf.ResultRequest{})
-	var responseFromServerTwo, _ = FrontendConn2.Result(context.Background(), &protobuf.ResultRequest{})
-	var responseFromServerThree, _ = FrontendConn3.Result(context.Background(), &protobuf.ResultRequest{})
+	var responseFromServerOne, _ = FrontEndConns[0].Result(context.Background(), &protobuf.ResultRequest{})
+	var responseFromServerTwo, _ = FrontEndConns[1].Result(context.Background(), &protobuf.ResultRequest{})
+	var responseFromServerThree, _ = FrontEndConns[2].Result(context.Background(), &protobuf.ResultRequest{})
 
 	var one, two, three = ValidateResultsReponsesFromServers(responseFromServerOne, responseFromServerTwo, responseFromServerThree)
 
@@ -165,9 +159,9 @@ func (s *server) NewBid(ctx context.Context, in *protobuf.NewBidRequest) (*proto
 	var serverHighestBid = MaxInt(oneAmount, twoAmount, threeAmount)
 	if timeleft > 0 {
 		if in.Amount > serverHighestBid {
-			FrontendConn1.NewBid(context.Background(), &protobuf.NewBidRequest{Bidder: in.Bidder, Amount: in.Amount})
-			FrontendConn2.NewBid(context.Background(), &protobuf.NewBidRequest{Bidder: in.Bidder, Amount: in.Amount})
-			FrontendConn3.NewBid(context.Background(), &protobuf.NewBidRequest{Bidder: in.Bidder, Amount: in.Amount})
+			FrontEndConns[0].NewBid(context.Background(), &protobuf.NewBidRequest{Bidder: in.Bidder, Amount: in.Amount})
+			FrontEndConns[1].NewBid(context.Background(), &protobuf.NewBidRequest{Bidder: in.Bidder, Amount: in.Amount})
+			FrontEndConns[2].NewBid(context.Background(), &protobuf.NewBidRequest{Bidder: in.Bidder, Amount: in.Amount})
 			return &protobuf.NewBidReply{Message: "Your bid was confirmed."}, nil
 		} else {
 			return &protobuf.NewBidReply{Message: "Your bid is lower or the same as the current bid. Current bid is " + strconv.FormatInt(serverHighestBid, 10)}, nil //TODO: errors.New("Your bid is lower or the same as the current bid.")
@@ -238,9 +232,9 @@ func printSlice(sliceToPrint []string) {
 }
 
 func (s *server) Result(ctx context.Context, in *protobuf.ResultRequest) (*protobuf.ResultReply, error) {
-	var responseFromServerOne, _ = FrontendConn1.Result(context.Background(), &protobuf.ResultRequest{})   //200
-	var responseFromServerTwo, _ = FrontendConn2.Result(context.Background(), &protobuf.ResultRequest{})   //200
-	var responseFromServerThree, _ = FrontendConn3.Result(context.Background(), &protobuf.ResultRequest{}) //150
+	var responseFromServerOne, _ = FrontEndConns[0].Result(context.Background(), &protobuf.ResultRequest{})   //200
+	var responseFromServerTwo, _ = FrontEndConns[1].Result(context.Background(), &protobuf.ResultRequest{})   //200
+	var responseFromServerThree, _ = FrontEndConns[2].Result(context.Background(), &protobuf.ResultRequest{}) //150
 
 	var one, two, three = ValidateResultsReponsesFromServers(responseFromServerOne, responseFromServerTwo, responseFromServerThree)
 	var bidder, amount, timeleft = BringResultToSync(one, two, three)
@@ -269,13 +263,13 @@ func BringResultToSync(one, two, three *protobuf.ResultReply) (string, int64, in
 		//Override all values to bring to sync
 		//TODO: this should not be the bidder that already exists in that server, but the one that sent the highest to one of the servers.
 		if oneAmount != -1 {
-			FrontendConn1.NewBid(context.Background(), &protobuf.NewBidRequest{Bidder: one.Bidder, Amount: serverHighestBid})
+			FrontEndConns[0].NewBid(context.Background(), &protobuf.NewBidRequest{Bidder: one.Bidder, Amount: serverHighestBid})
 		}
 		if twoAmount != -1 {
-			FrontendConn2.NewBid(context.Background(), &protobuf.NewBidRequest{Bidder: two.Bidder, Amount: serverHighestBid})
+			FrontEndConns[1].NewBid(context.Background(), &protobuf.NewBidRequest{Bidder: two.Bidder, Amount: serverHighestBid})
 		}
 		if threeAmount != -1 {
-			FrontendConn3.NewBid(context.Background(), &protobuf.NewBidRequest{Bidder: three.Bidder, Amount: serverHighestBid})
+			FrontEndConns[2].NewBid(context.Background(), &protobuf.NewBidRequest{Bidder: three.Bidder, Amount: serverHighestBid})
 		}
 	}
 	if one != nil && one.Bidder != "" {
@@ -302,9 +296,9 @@ func BringResultToSync(one, two, three *protobuf.ResultReply) (string, int64, in
 }
 
 func (s *server) GetTime(ctx context.Context, in *protobuf.GetTimeRequest) (*protobuf.GetTimeReply, error) {
-	var responseFromServerOne, _ = FrontendConn1.GetTime(context.Background(), &protobuf.GetTimeRequest{})
-	var responseFromServerTwo, _ = FrontendConn2.GetTime(context.Background(), &protobuf.GetTimeRequest{})
-	var responseFromServerThree, _ = FrontendConn3.GetTime(context.Background(), &protobuf.GetTimeRequest{})
+	var responseFromServerOne, _ = FrontEndConns[0].GetTime(context.Background(), &protobuf.GetTimeRequest{})
+	var responseFromServerTwo, _ = FrontEndConns[1].GetTime(context.Background(), &protobuf.GetTimeRequest{})
+	var responseFromServerThree, _ = FrontEndConns[2].GetTime(context.Background(), &protobuf.GetTimeRequest{})
 
 	var one, two, three = ValidateTimeReponsesFromServers(responseFromServerOne, responseFromServerTwo, responseFromServerThree)
 	var time = BringTimeToSync(one, two, three)
@@ -317,9 +311,9 @@ func BringTimeToSync(one, two, three int64) int64 {
 	fmt.Println("Minimum: " + strconv.FormatInt(minimumTimeLeft, 10) + " Based on " + strconv.FormatInt(one, 10) + "; " + strconv.FormatInt(two, 10) + "; " + strconv.FormatInt(three, 10) + ";")
 	if one != two || two != three || one != three {
 		//Override all values to bring to sync
-		FrontendConn1.NewTime(context.Background(), &protobuf.NewTimeRequest{TimeLeft: minimumTimeLeft})
-		FrontendConn2.NewTime(context.Background(), &protobuf.NewTimeRequest{TimeLeft: minimumTimeLeft})
-		FrontendConn3.NewTime(context.Background(), &protobuf.NewTimeRequest{TimeLeft: minimumTimeLeft})
+		FrontEndConns[0].NewTime(context.Background(), &protobuf.NewTimeRequest{TimeLeft: minimumTimeLeft})
+		FrontEndConns[1].NewTime(context.Background(), &protobuf.NewTimeRequest{TimeLeft: minimumTimeLeft})
+		FrontEndConns[2].NewTime(context.Background(), &protobuf.NewTimeRequest{TimeLeft: minimumTimeLeft})
 	}
 	return minimumTimeLeft
 }
